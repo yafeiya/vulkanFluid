@@ -1,0 +1,78 @@
+#version 450
+struct Particle{
+    vec3 Location;
+    vec3 Velocity;
+    vec3 DeltaLocation;
+    float Lambda;
+    float Density;
+    float Mass;
+
+    vec3 TmpVelocity;
+
+    uint CellHash;
+    uint TmpCellHash;
+
+    uint NumNgbrs;
+};
+layout(binding=0) uniform SimulateObj{
+    float dt;
+    float accumulated_t;
+    float restDensity;
+    float sphRadius;
+    uint numParticles;
+
+    float coffPoly6;
+    float coffSpiky;
+    float coffGradSpiky;
+
+    float scorrK;
+    float scorrN;
+    float scorrQ;
+};
+layout(binding=2) buffer ParticleSSBOout{
+    Particle particlesOut[];
+};
+layout(binding=4) uniform Boxinfo{
+    vec2 boxClampX;
+    vec2 boxClampY;
+    vec2 boxClampZ;
+
+    vec2 clampX_still;
+    vec2 clampY_still;
+    vec2 clampZ_still; 
+};
+layout(local_size_x=512,local_size_y=1,local_size_z=1) in;
+
+
+void main(){
+    uint globalindex = gl_GlobalInvocationID.x;
+    uint localindex = gl_LocalInvocationID.x;
+    if(globalindex >= numParticles) return;
+    
+    vec3 LocationStar = particlesOut[globalindex].Location + particlesOut[globalindex].DeltaLocation;
+    vec3 DeltaLocation = particlesOut[globalindex].DeltaLocation;
+    float distLeft = LocationStar.x-boxClampX.x;
+    float distRight = boxClampX.y - LocationStar.x;
+
+    float distFront = boxClampZ.y- LocationStar.z;
+    float distBack = LocationStar.z - boxClampZ.x;
+    
+    float distFloor = LocationStar.y - boxClampY.x;
+    float distCeil = boxClampY.y - LocationStar.y;
+
+    float dists[6] = {distLeft,distRight,distFront,distBack,distFloor,distCeil};
+    vec3 normals[6] = {{1,0,0},{-1,0,0},{0,0,-1},{0,0,1},{0,1,0},{0,-1,0}};
+    float walldist = distLeft;
+    vec3 wallnormal = {1,0,0};
+    for(int i=1;i<6;++i){
+        if(dists[i] < walldist){
+            walldist = dists[i];
+            wallnormal = normals[i]; 
+        }
+    }
+    float radius = sphRadius/4;
+    if(walldist < radius){
+        DeltaLocation += (radius-walldist)*wallnormal;
+    }
+    particlesOut[globalindex].Location += DeltaLocation;
+}
