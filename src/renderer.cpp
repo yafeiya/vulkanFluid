@@ -1232,19 +1232,19 @@ void Renderer::CreateDescriptorSetLayout()
 void Renderer::CreateDescriptorPool()
 {
     std::array<VkDescriptorPoolSize,4> poolsizes{};
-    poolsizes[0].descriptorCount = 8;
+    poolsizes[0].descriptorCount = 64;
     poolsizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    poolsizes[1].descriptorCount = 8;
+    poolsizes[1].descriptorCount = 64;
     poolsizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolsizes[2].descriptorCount = 16;
+    poolsizes[2].descriptorCount = 64;
     poolsizes[2].type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    poolsizes[3].descriptorCount = 8;
+    poolsizes[3].descriptorCount = 64;
     poolsizes[3].type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
 
 
     VkDescriptorPoolCreateInfo createinfo{};
     createinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    createinfo.maxSets = 16;
+    createinfo.maxSets = 64;
     createinfo.poolSizeCount = static_cast<uint32_t>(poolsizes.size());
     createinfo.pPoolSizes = poolsizes.data();
 
@@ -2438,12 +2438,12 @@ void Renderer::GetRequestDeviceExts(std::vector<const char *>& exts)
 {
     exts.resize(0);
     exts.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-    exts.push_back(VK_EXT_EXTENDED_DYNAMIC_STATE_3_EXTENSION_NAME);
+ /*   exts.push_back(VK_EXT_EXTENDED_DYNAMIC_STATE_3_EXTENSION_NAME);
     exts.push_back(VK_EXT_SHADER_OBJECT_EXTENSION_NAME);
     exts.push_back(VK_EXT_EXTENDED_DYNAMIC_STATE_EXTENSION_NAME);
     exts.push_back("VK_KHR_dynamic_rendering");
     exts.push_back("VK_KHR_depth_stencil_resolve");
-    exts.push_back("VK_KHR_create_renderpass2");
+    exts.push_back("VK_KHR_create_renderpass2");*/
 }
 void Renderer::GetRequestDeviceFeature(VkPhysicalDeviceFeatures& features)
 {

@@ -16,7 +16,7 @@
 int main(int argc,char** argv){
     
     try{
-        float radius = 0.008;
+        float radius = 0.016;
         float restDesity = 1000.0f;
         float diam = 2*radius;
 
